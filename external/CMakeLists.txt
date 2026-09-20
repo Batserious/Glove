@@ -2,4 +2,4 @@
 add_subdirectory(GoogleTest)
 
 # Google Benchmark
-add_subdirectory(Benchmark)
+add_subdirectory(GoogleBenchmark)
