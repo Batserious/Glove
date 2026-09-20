@@ -4,6 +4,5 @@ project(Benches)
 file(GLOB SOURCES CONFIGURE_DEPENDS "*.cpp")
 add_executable(Benches ${SOURCES})
 
-find_package(benchmark REQUIRED)
 target_link_libraries(Benches benchmark::benchmark)
 

@@ -103,8 +103,9 @@ MESSAGE(STATUS "C++ Compilation flags: " ${CMAKE_CXX_FLAGS})
 add_subdirectory(external EXCLUDE_FROM_ALL SYSTEM)
 add_subdirectory(src)
 
-add_subdirectory(benchmark)
-
 enable_testing()
 add_subdirectory(tests)
+
+add_subdirectory(benchmark)
+
 
