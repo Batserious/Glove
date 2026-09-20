@@ -76,11 +76,18 @@ endif ()
 
 message(STATUS "Build type = ${CMAKE_BUILD_TYPE}")
 
-add_compile_options(
-        -Wall
-        -Werror
-        -Wextra
-)
+if (MSVC)
+    add_compile_options(
+            /W4
+            /WX
+    )
+else ()
+    add_compile_options(
+            -Wall
+            -Werror
+            -Wextra
+    )
+endif ()
 
 add_subdirectory(external EXCLUDE_FROM_ALL SYSTEM)
 add_subdirectory(src)
@@ -89,5 +96,4 @@ enable_testing()
 add_subdirectory(tests)
 
 add_subdirectory(benchmark)
-
 
