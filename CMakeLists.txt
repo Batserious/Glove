@@ -76,29 +76,11 @@ endif ()
 
 message(STATUS "Build type = ${CMAKE_BUILD_TYPE}")
 
-#add_compile_options(
-#        -Wall
-#        -Werror
-#        -Wno-asm-operand-widths
-#        -Wno-unused-command-line-argument
-#        -Wno-deprecated-declarations
-#        -Wextra
-#        -Wno-unused-parameter
-#        -Wno-unused-private-field
-#        -fcolor-diagnostics
-#)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
-string(APPEND CMAKE_CXX_FLAGS " -Wno-asm-operand-widths")
-string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
-string(APPEND CMAKE_CXX_FLAGS " -Wno-deprecated-declarations")
-string(APPEND CMAKE_CXX_FLAGS " -Wextra -Wno-unused-parameter")
-string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-private-field")
-string(APPEND CMAKE_CXX_FLAGS " -fcolor-diagnostics")
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-asm-operand-widths -Wno-unused-command-line-argument -Wno-deprecated-declarations -Wextra -Wno-unused-parameter -Wno-unused-private-field -pthread -fcolor-diagnostics")
-
-MESSAGE(STATUS "C++ Compilation flags: " ${CMAKE_CXX_FLAGS})
+add_compile_options(
+        -Wall
+        -Werror
+        -Wextra
+)
 
 add_subdirectory(external EXCLUDE_FROM_ALL SYSTEM)
 add_subdirectory(src)
