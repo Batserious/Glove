@@ -8,4 +8,3 @@ target_link_libraries(Tests GTest::gtest GTest::gmock)
 
 include(GoogleTest)
 gtest_discover_tests(Tests)
-

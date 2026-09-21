@@ -55,6 +55,12 @@ jobs:
           cmakeVersion: "~4.3"
           ninjaVersion: "latest"
 
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgDirectory: '${{ runner.tool_cache }}/vcpkg'
+
       - name: Initialize MSVC developer environment
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
@@ -70,6 +76,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake"
           -S ${{ github.workspace }}
 
       - name: Build

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 4.3)
-project(Glove LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23 CACHE STRING "C++ standard to use")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,6 +33,8 @@ if (NOT CMAKE_TOOLCHAIN_FILE)
         message(STATUS "Using vcpkg toolchain from VCPKG_ROOT: ${CMAKE_TOOLCHAIN_FILE}")
     endif ()
 endif ()
+
+project(Glove LANGUAGES CXX)
 
 # Git metadata is useful in build logs, but should not prevent source archives
 # or environments without Git from configuring.

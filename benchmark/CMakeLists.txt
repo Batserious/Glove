@@ -5,4 +5,3 @@ file(GLOB SOURCES CONFIGURE_DEPENDS "*.cpp")
 add_executable(Benches ${SOURCES})
 
 target_link_libraries(Benches benchmark::benchmark)
-
