@@ -15,3 +15,8 @@ if (NOT TARGET benchmark::benchmark)
             "Disable installation of bundled Google Benchmark" FORCE)
     add_subdirectory(GoogleBenchmark EXCLUDE_FROM_ALL)
 endif ()
+
+find_package(spdlog QUIET)
+if (NOT TARGET spdlog::spdlog)
+    add_subdirectory(Spdlog EXCLUDE_FROM_ALL)
+endif ()

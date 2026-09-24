@@ -4,3 +4,6 @@
 [submodule "external/GoogleBenchmark"]
 	path = external/GoogleBenchmark
 	url = https://github.com/google/benchmark.git
+[submodule "external/Spdlog"]
+	path = external/Spdlog
+	url = https://github.com/gabime/spdlog.git
