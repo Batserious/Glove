@@ -26,6 +26,8 @@ endif ()
 find_package(asio QUIET)
 if (NOT TARGET asio::asio)
     add_library(asio INTERFACE)
+    # Keep bundled Asio ahead of system include directories to avoid mixing header ABIs.
+    set_target_properties(asio PROPERTIES SYSTEM FALSE)
     target_include_directories(asio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Asio/asio/include)
     target_compile_definitions(asio INTERFACE ASIO_STANDALONE)
     find_package(Threads REQUIRED)
