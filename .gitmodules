@@ -7,3 +7,6 @@
 [submodule "external/Spdlog"]
 	path = external/Spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "external/Asio"]
+	path = external/Asio
+	url = https://github.com/chriskohlhoff/asio.git
