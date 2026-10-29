@@ -8,8 +8,24 @@
 using namespace glove::e37;
 using namespace std::chrono_literals;
 
+TEST(E37Config, DefaultsToHsmsSS) {
+    const Config config;
+    EXPECT_EQ(config.mode, Mode::HsmsSS);
+    EXPECT_TRUE(validate_config(config));
+
+    ProtocolStateMachine machine(config);
+    machine.connected();
+    EXPECT_TRUE(machine.validate_outgoing({0xffff, 0, 0, 0, 1, 0}));
+    EXPECT_FALSE(machine.validate_outgoing({0, 0, 0, 0, 1, 0}));
+    EXPECT_FALSE(machine.validate_outgoing({0xffff, 0, 0, 0, 5, 0}));
+    machine.response_received({0xffff, 0, 0, 0, 1, 0}, {0xffff, 0, 0, 0, 2, 0});
+    EXPECT_TRUE(machine.session_selected(0));
+    EXPECT_FALSE(machine.validate_outgoing({0xffff, 0, 0, 0, 3, 0}));
+}
+
 TEST(E37Config, ValidatesLimitsAndBothModes) {
     Config config;
+    config.mode = Mode::Generic;
     EXPECT_TRUE(validate_config(config));
     config.timeouts.t3 = 120s;
     config.timeouts.t5 = 240s;
@@ -28,7 +44,7 @@ TEST(E37Config, ValidatesLimitsAndBothModes) {
     config.max_receive_length = 10;
     config.session_ids        = {0xffff};
     EXPECT_TRUE(validate_config(config));
-    config.mode = Mode::HsmsSs;
+    config.mode = Mode::HsmsSS;
     EXPECT_FALSE(validate_config(config));
     config.session_ids = {0x7fff};
     EXPECT_TRUE(validate_config(config));
@@ -114,6 +130,7 @@ TEST(E37Codec, ValidatesAllControlShapesAndReplyWBit) {
 
 TEST(E37State, GenericAllowsBilateralSelectAndMultipleIndependentSessions) {
     Config config;
+    config.mode         = Mode::Generic;
     config.connect_mode = ConnectMode::Passive;
     config.session_ids  = {1, 2};
     ProtocolStateMachine machine(config);
@@ -139,7 +156,9 @@ TEST(E37State, GenericAllowsBilateralSelectAndMultipleIndependentSessions) {
 }
 
 TEST(E37State, SimultaneousDeselectOverridesBusyPolicy) {
-    ProtocolStateMachine machine(Config{});
+    Config config;
+    config.mode = Mode::Generic;
+    ProtocolStateMachine machine(config);
     machine.connected();
     machine.respond({0, 0, 0, 0, 1, 1});
     Header request{0, 0, 0, 0, 3, 2};
@@ -150,9 +169,9 @@ TEST(E37State, SimultaneousDeselectOverridesBusyPolicy) {
     EXPECT_EQ(machine.state(), State::NotSelected);
 }
 
-TEST(E37State, HsmsSsEnforcesProfileWithoutConflatingDeviceAndSelectionIds) {
+TEST(E37State, HsmsSSEnforcesProfileWithoutConflatingDeviceAndSelectionIds) {
     Config config;
-    config.mode        = Mode::HsmsSs;
+    config.mode        = Mode::HsmsSS;
     config.session_ids = {1, 2};
     ProtocolStateMachine active(config);
     active.connected();
@@ -176,7 +195,9 @@ TEST(E37State, HsmsSsEnforcesProfileWithoutConflatingDeviceAndSelectionIds) {
 }
 
 TEST(E37State, RejectReasonsAreDistinct) {
-    ProtocolStateMachine machine(Config{});
+    Config config;
+    config.mode = Mode::Generic;
+    ProtocolStateMachine machine(config);
     machine.connected();
     EXPECT_EQ(machine.reject_reason({0, 1, 1, 0, 0, 1}), 4);
     EXPECT_EQ(machine.reject_reason({0, 0, 0, 0, 8, 1}), 1);
@@ -291,6 +312,6 @@ TEST(E37Transactions, CapacityCancellationAndReject) {
         ++completed;
     }));
     manager->write_started(second);
-    EXPECT_TRUE(manager->receive({{0xffff, 0, 4, 0, 7, second}, {}}, Mode::HsmsSs));
+    EXPECT_TRUE(manager->receive({{0xffff, 0, 4, 0, 7, second}, {}}, Mode::HsmsSS));
     EXPECT_EQ(completed, 2);
 }

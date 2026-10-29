@@ -42,7 +42,7 @@ namespace glove::e37 {
                     config.session_ids.size()) {
             return std::unexpected(error(ErrorCode::InvalidConfig, "Session IDs must be nonempty and unique"));
         }
-        if (config.mode == Mode::HsmsSs &&
+        if (config.mode == Mode::HsmsSS &&
             std::ranges::any_of(config.session_ids, [](SessionId id) { return id > 0x7fff; })) {
             return std::unexpected(error(ErrorCode::InvalidConfig, "HSMS-SS Device IDs must fit in 15 bits"));
         }

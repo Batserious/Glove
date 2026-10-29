@@ -15,7 +15,7 @@ namespace glove::e37 {
     bool ProtocolStateMachine::supports(SessionId id) const { return supported_.contains(id); }
 
     bool ProtocolStateMachine::session_selected(SessionId id) const {
-        return supports(id) && (mode_ == Mode::HsmsSs ? !selected_.empty() : selected_.contains(id));
+        return supports(id) && (mode_ == Mode::HsmsSS ? !selected_.empty() : selected_.contains(id));
     }
 
     void ProtocolStateMachine::connected() { connected_ = true; }
@@ -40,12 +40,12 @@ namespace glove::e37 {
             }
             return {};
         }
-        if (mode_ == Mode::HsmsSs && h.session_id != 0xffff) {
+        if (mode_ == Mode::HsmsSS && h.session_id != 0xffff) {
             return std::unexpected(error(ErrorCode::InvalidMessage, "HSMS-SS controls require Session ID 0xffff"));
         }
         if (h.stype == 1) {
             if (selecting_.contains(h.session_id) || deselecting_.contains(h.session_id) ||
-                (mode_ == Mode::HsmsSs && (connect_mode_ != ConnectMode::Active || state() != State::NotSelected))) {
+                (mode_ == Mode::HsmsSS && (connect_mode_ != ConnectMode::Active || state() != State::NotSelected))) {
                 return std::unexpected(error(ErrorCode::InvalidState, "Select is not permitted now"));
             }
             if (mode_ == Mode::Generic && !supports(h.session_id)) {
@@ -53,13 +53,13 @@ namespace glove::e37 {
             }
         }
         else if (h.stype == 3) {
-            if (mode_ == Mode::HsmsSs || !session_selected(h.session_id) || deselecting_.contains(h.session_id) ||
+            if (mode_ == Mode::HsmsSS || !session_selected(h.session_id) || deselecting_.contains(h.session_id) ||
                 selecting_.contains(h.session_id)) {
                 return std::unexpected(error(ErrorCode::InvalidState, "Deselect is not permitted now"));
             }
         }
         else if (h.stype == 5) {
-            if (mode_ == Mode::HsmsSs && state() != State::Selected) {
+            if (mode_ == Mode::HsmsSS && state() != State::Selected) {
                 return std::unexpected(error(ErrorCode::InvalidState, "HSMS-SS Linktest requires Selected"));
             }
         }
@@ -78,7 +78,7 @@ namespace glove::e37 {
         if (!connected_) {
             return std::unexpected(error(ErrorCode::InvalidState, "Message received without TCP connection"));
         }
-        if (mode_ == Mode::HsmsSs) {
+        if (mode_ == Mode::HsmsSS) {
             if ((h.is_data() && h.session_id > 0x7fff) || (!h.is_data() && h.session_id != 0xffff)) {
                 return std::unexpected(error(ErrorCode::InvalidMessage, "Invalid HSMS-SS Session ID"));
             }

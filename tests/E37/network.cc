@@ -392,7 +392,7 @@ namespace {
         ASSERT_TRUE(pump([&] { return client_connections == 2; }));
         EXPECT_GE(std::chrono::steady_clock::now() - stopped_at, 1s);
         EXPECT_NE(client_connection, old);
-        if (GetParam() == Mode::HsmsSs) {
+        if (GetParam() == Mode::HsmsSS) {
             ASSERT_TRUE(pump([&] { return client_connection->state() == State::Selected; }));
         }
     }
@@ -522,7 +522,7 @@ namespace {
         ASSERT_TRUE(pump([&] { return restarted && client_connections == 2; }));
         EXPECT_NE(client_connection, old);
         EXPECT_EQ(old->state(), State::NotConnected);
-        if (GetParam() == Mode::HsmsSs) {
+        if (GetParam() == Mode::HsmsSS) {
             ASSERT_TRUE(pump([&] { return client_connection->state() == State::Selected; }));
         }
     }
@@ -530,7 +530,7 @@ namespace {
     TEST_P(E37Network, SimultaneousGenericProceduresAndSsRestrictions) {
         start_server();
         start_client({}, {}, false);
-        if (GetParam() == Mode::HsmsSs) {
+        if (GetParam() == Mode::HsmsSS) {
             ASSERT_TRUE(pump([&] { return client_connection->state() == State::Selected; }));
             bool denied = false;
             server_connection->async_select(0xffff, [&](Result<void> result) {
@@ -581,6 +581,6 @@ namespace {
         ASSERT_TRUE(pump([&] { return ended && failed; }, 500ms));
     }
 
-    INSTANTIATE_TEST_SUITE_P(Profiles, E37Network, testing::Values(Mode::Generic, Mode::HsmsSs));
+    INSTANTIATE_TEST_SUITE_P(Profiles, E37Network, testing::Values(Mode::Generic, Mode::HsmsSS));
 
 } // namespace

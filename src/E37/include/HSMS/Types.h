@@ -15,7 +15,7 @@ namespace glove::e37 {
     using SessionId     = std::uint16_t;
     using TransactionId = std::uint64_t;
 
-    enum class Mode { Generic, HsmsSs };
+    enum class Mode { Generic, HsmsSS };
     enum class ConnectMode { Active, Passive };
     enum class State { NotConnected, NotSelected, Selected };
     enum class SType : std::uint8_t {
@@ -94,7 +94,7 @@ namespace glove::e37 {
     };
 
     struct Config {
-        Mode                   mode         = Mode::Generic;
+        Mode                   mode         = Mode::HsmsSS;
         ConnectMode            connect_mode = ConnectMode::Active;
         std::string            address      = "127.0.0.1";
         std::uint16_t          port         = 5000;

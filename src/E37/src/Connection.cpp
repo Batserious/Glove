@@ -47,7 +47,7 @@ namespace glove::e37 {
         machine_.connected();
         notify();
         read();
-        if (config_.mode == Mode::HsmsSs && config_.connect_mode == ConnectMode::Active) {
+        if (config_.mode == Mode::HsmsSS && config_.connect_mode == ConnectMode::Active) {
             control(1, 0xffff, {});
         }
     }
@@ -177,7 +177,7 @@ namespace glove::e37 {
     }
 
     void Connection::reject(const Header& h, std::uint8_t reason) {
-        Header rejection{config_.mode == Mode::HsmsSs ? SessionId{0xffff} : h.session_id,
+        Header rejection{config_.mode == Mode::HsmsSS ? SessionId{0xffff} : h.session_id,
                          reason == 2 ? h.ptype : h.stype,
                          reason,
                          0,
@@ -244,7 +244,7 @@ namespace glove::e37 {
                 reject(h, 3);
         }
         else if (h.stype == 9) {
-            if (config_.mode == Mode::HsmsSs) {
+            if (config_.mode == Mode::HsmsSS) {
                 close(error(ErrorCode::Disconnected, "Remote Separate"), false);
             }
             else {
@@ -259,7 +259,7 @@ namespace glove::e37 {
             if (h.stype == 3 && callbacks_.on_deselect_requested)
                 status = callbacks_.on_deselect_requested(*this, h);
             const auto response      = machine_.respond(h, status);
-            const bool failed_select = config_.mode == Mode::HsmsSs && h.stype == 1 && response.byte3 != 0;
+            const bool failed_select = config_.mode == Mode::HsmsSS && h.stype == 1 && response.byte3 != 0;
             auto       sent = enqueue({response, {}}, [weak = weak_from_this(), failed_select](Result<void> result) {
                 if (const auto self = weak.lock(); self && !self->closed_) {
                     if (!result)
@@ -358,7 +358,7 @@ namespace glove::e37 {
             if (!result) {
                 const auto failure    = result.error();
                 const bool must_close = !self->closed_ && (failure.code == ErrorCode::T6Timeout ||
-                                                           (self->config_.mode == Mode::HsmsSs && request.stype == 1));
+                                                           (self->config_.mode == Mode::HsmsSS && request.stype == 1));
                 self->finish(completion, std::unexpected(failure));
                 if (must_close)
                     self->close(failure, true);
@@ -372,7 +372,7 @@ namespace glove::e37 {
                 failure.header = result->header;
                 failure.status = result->header.byte3;
                 self->finish(completion, std::unexpected(failure));
-                if (self->config_.mode == Mode::HsmsSs && request.stype == 1)
+                if (self->config_.mode == Mode::HsmsSS && request.stype == 1)
                     self->close(failure, true);
             }
             else {
@@ -567,7 +567,7 @@ namespace glove::e37 {
                     }
                     header.system_bytes = *system_bytes;
                     self->separating_.insert(id);
-                    if (self->config_.mode == Mode::HsmsSs) {
+                    if (self->config_.mode == Mode::HsmsSS) {
                         self->stopping_ = true;
                         self->heartbeat_.cancel();
                         self->arm_shutdown();
@@ -584,7 +584,7 @@ namespace glove::e37 {
                             }
                             connection->finish(completion, std::move(result));
                             if (separate_succeeded &&
-                                (connection->config_.mode == Mode::HsmsSs ||
+                                (connection->config_.mode == Mode::HsmsSS ||
                                  (connection->stopping_ && connection->machine_.state() == State::NotSelected))) {
                                 connection->close(error(ErrorCode::Disconnected, "Local Separate"), false);
                             }
@@ -592,7 +592,7 @@ namespace glove::e37 {
                     });
                     if (!sent) {
                         self->separating_.erase(id);
-                        if (self->config_.mode == Mode::HsmsSs) {
+                        if (self->config_.mode == Mode::HsmsSS) {
                             self->stopping_ = false;
                             self->shutdown_.cancel();
                             self->arm_linktest();

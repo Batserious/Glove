@@ -77,7 +77,7 @@ namespace glove::e37 {
         const auto& request = it->second->request;
         if (h.stype == 7) {
             const auto rejected_type    = h.byte3 == 2 ? request.ptype : request.stype;
-            const auto expected_session = mode == Mode::HsmsSs ? SessionId{0xffff} : request.session_id;
+            const auto expected_session = mode == Mode::HsmsSS ? SessionId{0xffff} : request.session_id;
             if (h.session_id != expected_session || h.byte2 != rejected_type)
                 return false;
             auto failure   = error(ErrorCode::Rejected, "Remote entity rejected transaction");
@@ -137,7 +137,7 @@ namespace glove::e37 {
     void TransactionManager::cancel_data(SessionId id, Mode mode, const ErrorInfo& failure) {
         std::vector<std::uint32_t> cancelled;
         for (const auto& [system_bytes, pending] : entries_) {
-            if (pending->request.is_data() && (mode == Mode::HsmsSs || pending->request.session_id == id)) {
+            if (pending->request.is_data() && (mode == Mode::HsmsSS || pending->request.session_id == id)) {
                 cancelled.push_back(system_bytes);
             }
         }

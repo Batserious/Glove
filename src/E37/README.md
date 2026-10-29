@@ -1,5 +1,7 @@
 # E37 / HSMS
 
+[English](./README.md) | [简体中文](./README.zh-CN.md)
+
 C++23 asynchronous HSMS transport and transaction library. Link `Glove::E37` and
 include `<HSMS/Endpoint.h>`. The library reuses standalone Asio and spdlog from
 the parent build; it does not own an I/O thread.
@@ -10,12 +12,12 @@ remain in the headers.
 
 ## Scope and profiles
 
-The implementation is based on the repository's SEMI E37-0222 document. The
-optional `Mode::HsmsSs` restrictions follow the supplied E37.1-0702 document,
+The implementation is based on the repository's SEMI E37-0222 document.
+`Mode::HsmsSS` is the default; its restrictions follow the supplied E37.1-0702 document,
 which is marked **SUPERSEDED**. This is not a claim of conformance to a newer
 E37.1 edition, HSMS-GS, or certification by SEMI.
 
-| Behavior | `Mode::Generic` (default) | `Mode::HsmsSs` |
+| Behavior | `Mode::Generic` | `Mode::HsmsSS` (default) |
 | --- | --- | --- |
 | Select initiation | Either side, explicitly requested | Active side automatically |
 | Select session ID | Configured 16-bit session ID | `0xffff` |
@@ -26,6 +28,7 @@ E37.1 edition, HSMS-GS, or certification by SEMI.
 | Data routing | Each ID must have its own successful Select | All configured 15-bit Device IDs share selection |
 | Reject | Supported | Supported, not disabled |
 
+Set `config.mode = Mode::Generic` explicitly to use Generic mode.
 Generic mode uses an explicit one-Select-per-session-ID association. E37 leaves
 session association to subordinate standards, so peers must agree to this
 convention. Multiple generic sessions are independently selectable on one
@@ -150,6 +153,7 @@ Missing primary handlers produce an explicit unsupported-handler diagnostic.
 
 | Setting | Default | Accepted values |
 | --- | --- | --- |
+| Protocol mode | `Mode::HsmsSS` | `Mode::HsmsSS` or `Mode::Generic` |
 | T3 | 45 s | 1..120 s, 1 s resolution |
 | T5 | 10 s | 1..240 s, 1 s resolution |
 | T6 | 5 s | 1..240 s, 1 s resolution |
@@ -201,7 +205,7 @@ int main() {
     using namespace glove::e37;
     asio::io_context io;
     Config config;
-    config.mode = Mode::HsmsSs;
+    config.mode = Mode::HsmsSS;
     config.address = "127.0.0.1";
     config.port = 5000;
     config.reconnect = false;
